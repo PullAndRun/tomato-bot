@@ -1,0 +1,11 @@
+{
+  "name": "deep-bot",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "^1.2.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
