@@ -1,11 +1,16 @@
 {
   "name": "deep-bot",
   "type": "module",
-  "private": true,
   "devDependencies": {
-    "@types/bun": "^1.2.3"
+    "@types/bun": "^1.2.5"
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "@deep/config": "file:data/config",
+    "@icqqjs/icqq": "^1.6.4",
+    "dayjs": "^1.11.13",
+    "winston": "^3.17.0"
   }
 }
