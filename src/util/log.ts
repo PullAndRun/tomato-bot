@@ -1,8 +1,11 @@
-import { createLogger, transports, format } from "winston";
+import { text } from "@clack/prompts";
 import config from "@deep/config/global.toml";
 import dayjs from "dayjs";
+import { createLogger, format, transports } from "winston";
 
 const { combine, timestamp } = format;
+
+const logDir = `${config.log.dir_name}/${dayjs().format("YYYY-MM-DD")}`;
 
 const logger = createLogger({
   level: "info",
@@ -10,16 +13,28 @@ const logger = createLogger({
   transports: [
     new transports.Console(),
     new transports.File({
-      dirname: config.log.dir_name + "/" + dayjs().format(`YYYY-MM-DD`),
+      dirname: logDir,
       filename: "error.log",
       level: "error",
     }),
     new transports.File({
-      dirname: config.log.dir_name + "/" + dayjs().format(`YYYY-MM-DD`),
+      dirname: logDir,
       filename: "warn.log",
       level: "warn",
     }),
   ],
 });
 
-export { logger };
+async function promptUserInput(
+  message: string,
+  placeholder: string
+): Promise<string> {
+  const input = await text({ message, placeholder });
+  if (!input) {
+    logger.error("未输入任何内容，请重新输入");
+    return await promptUserInput(message, placeholder);
+  }
+  return input.toString();
+}
+
+export { logger, promptUserInput };
