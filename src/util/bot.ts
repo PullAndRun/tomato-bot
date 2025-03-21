@@ -83,15 +83,29 @@ async function cmd(
   }>,
   event: GroupMessageEvent
 ) {
+  const cmdParser = (cmd: string) => {
+    return cmd === "system"
+      ? "系统管理员"
+      : cmd === "owner"
+      ? "群主"
+      : cmd === "admin"
+      ? "群管理员"
+      : "任何人";
+  };
   for (const cmd of cmdList) {
     if (!message.startsWith(cmd.command)) {
       continue;
     }
+    const roleHierarchy = ["member", "admin", "owner", "system"];
     if (
-      event.sender.role === "member" &&
+      roleHierarchy.indexOf(event.sender.role || "system") <
+        roleHierarchy.indexOf(cmd.role) &&
       event.sender.user_id !== config.bot.admin
     ) {
-      await replyGroupMsg(event, ["您使用的命令需要管理员权限。"]);
+      await replyGroupMsg(event, [
+        `\n权限不足，无法执行命令`,
+        `\n您需要：${cmdParser(cmd.role)} 权限`,
+      ]);
       return;
     }
     await cmd.plugin(event, message, cmd.command).catch((e) => {
@@ -106,15 +120,9 @@ async function cmd(
   const intro = cmdList
     .map(
       (cmd) =>
-        `指令：${cmd.command}\n说明：${cmd.comment}\n执行权限:${
-          cmd.role === "system"
-            ? "系统管理员"
-            : cmd.role === "owner"
-            ? "群主"
-            : cmd.role === "admin"
-            ? "群管理员"
-            : "任何人"
-        }`
+        `指令：${cmd.command}\n说明：${cmd.comment}\n执行权限:${cmdParser(
+          cmd.role
+        )}`
     )
     .join("\n\n");
   await replyGroupMsg(event, [intro]);
