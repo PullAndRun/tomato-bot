@@ -1,5 +1,5 @@
 import { text } from "@clack/prompts";
-import config from "@deep/config/global.toml";
+import config from "@tomato/config/global.toml";
 import dayjs from "dayjs";
 import { createLogger, format, transports } from "winston";
 

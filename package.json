@@ -1,5 +1,5 @@
 {
-  "name": "deep-bot",
+  "name": "tomato-bot",
   "type": "module",
   "devDependencies": {
     "@types/bun": "^1.2.5"
@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@clack/prompts": "^0.10.0",
-    "@deep/config": "file:data/config",
+    "@tomato/config": "file:data/config",
     "@icqqjs/icqq": "^1.6.4",
     "dayjs": "^1.11.13",
     "pg": "^8.14.1",

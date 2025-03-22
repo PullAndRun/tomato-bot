@@ -1,4 +1,4 @@
-import config from "@deep/config/global.toml";
+import config from "@tomato/config/global.toml";
 import { DataSource } from "typeorm";
 import { logger } from "./log";
 
