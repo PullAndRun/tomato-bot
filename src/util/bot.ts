@@ -89,13 +89,9 @@ async function cmd(
   message: string,
   cmdList: Array<{
     command: string;
-    role: "system" | "owner" | "admin" | "member";
     comment: string;
-    plugin: (
-      event: GroupMessageEvent,
-      message: string,
-      command: string
-    ) => Promise<void>;
+    role: "system" | "owner" | "admin" | "member";
+    plugin: (event: GroupMessageEvent, message: string) => Promise<void>;
   }>,
   event: GroupMessageEvent
 ) {
@@ -127,7 +123,7 @@ async function cmd(
       ]);
       return;
     }
-    await cmd.plugin(event, message, cmd.command).catch((e) => {
+    await cmd.plugin(event, msgRmCmd(message, [cmd.command])).catch((e) => {
       logger.error(
         `->错误:命令执行失败,->命令:${cmd.command},->原因:${JSON.stringify(
           e
