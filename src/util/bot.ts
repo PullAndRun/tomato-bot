@@ -69,6 +69,22 @@ async function replyGroupMsg(event: GroupMessageEvent, message: Sendable) {
   });
 }
 
+function msgRmCmd(msg: string, cmd: string[]) {
+  return cmd.reduce(
+    (acc, cur) =>
+      msgText(acc.replace(new RegExp(`(^\\s*${cur}\\s*)`, "g"), "")),
+    msg
+  );
+}
+
+function msgText(msg: string) {
+  return msg
+    .replace(new RegExp(`(\\[.+?\\])`, "g"), "")
+    .replace(/(\r+)/g, "\r")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 async function cmd(
   message: string,
   cmdList: Array<{
@@ -83,6 +99,7 @@ async function cmd(
   }>,
   event: GroupMessageEvent
 ) {
+  event.message;
   const cmdParser = (cmd: string) => {
     return cmd === "system"
       ? "系统管理员"
@@ -132,4 +149,4 @@ async function init() {
   await login(config.account.qq.id, config.account.qq.password);
 }
 
-export { cmd, init, replyGroupMsg, sendGroupMsg };
+export { cmd, init, msgRmCmd, replyGroupMsg, sendGroupMsg };

@@ -12,6 +12,8 @@
     "@deep/config": "file:data/config",
     "@icqqjs/icqq": "^1.6.4",
     "dayjs": "^1.11.13",
+    "pg": "^8.14.1",
+    "typeorm": "^0.3.21",
     "winston": "^3.17.0"
   }
 }
