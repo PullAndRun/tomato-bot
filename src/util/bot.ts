@@ -99,15 +99,17 @@ async function cmd(
   }>,
   event: GroupMessageEvent
 ) {
-  event.message;
   const cmdParser = (cmd: string) => {
-    return cmd === "system"
-      ? "系统管理员"
-      : cmd === "owner"
-      ? "群主"
-      : cmd === "admin"
-      ? "群管理员"
-      : "任何人";
+    switch (cmd) {
+      case "system":
+        return "系统管理员";
+      case "owner":
+        return "群主";
+      case "admin":
+        return "群管理员";
+      default:
+        return "任何人";
+    }
   };
   for (const cmd of cmdList) {
     if (!message.startsWith(cmd.command)) {
