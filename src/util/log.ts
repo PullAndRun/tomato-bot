@@ -31,7 +31,7 @@ async function promptUserInput(
 ): Promise<string> {
   const input = await text({ message, placeholder });
   if (!input) {
-    logger.error("未输入任何内容，请重新输入");
+    logger.warn("->警告:未输入任何内容,请重新输入");
     return await promptUserInput(message, placeholder);
   }
   return input.toString();

@@ -42,7 +42,7 @@ async function login(id: number, password: string) {
 function getClient() {
   const client = clients[0];
   if (!client) {
-    throw new Error("没有在线机器人");
+    throw new Error("->错误:没有在线机器人");
   }
   return client;
 }
@@ -51,20 +51,20 @@ async function sendGroupMsg(gid: number, message: Sendable) {
   await getClient()
     .sendGroupMsg(gid, message)
     .catch((e) => {
-      logger.error(
-        `\n错误：群消息发送失败\n群号:${gid}\n原因：${JSON.stringify(
+      logger.warn(
+        `->警告:群消息发送失败,->群号:${gid},->原因:${JSON.stringify(
           e
-        )}\n消息内容：${JSON.stringify(message)}`
+        )},->消息内容:${JSON.stringify(message)}`
       );
     });
 }
 
 async function replyGroupMsg(event: GroupMessageEvent, message: Sendable) {
   await event.reply(message, true).catch((e) => {
-    logger.error(
-      `\n错误：群消息回复失败\n群号:${event.group_id}\n原因：${JSON.stringify(
+    logger.warn(
+      `->警告:群消息回复失败,->群号:${event.group_id},->原因:${JSON.stringify(
         e
-      )}\n消息内容：${JSON.stringify(message)}`
+      )},->消息内容:${JSON.stringify(message)}`
     );
   });
 }
@@ -123,15 +123,15 @@ async function cmd(
     ) {
       await replyGroupMsg(event, [
         `\n权限不足，无法执行命令`,
-        `\n您需要：${cmdParser(cmd.role)} 权限`,
+        `\n您需要：${cmdParser(cmd.role)}权限`,
       ]);
       return;
     }
     await cmd.plugin(event, message, cmd.command).catch((e) => {
       logger.error(
-        `\n错误：命令执行失败\n命令：${cmd.command}\n原因：${JSON.stringify(
+        `->错误:命令执行失败,->命令:${cmd.command},->原因:${JSON.stringify(
           e
-        )}\n消息内容：${message}`
+        )},->消息内容：${message}`
       );
     });
     return;

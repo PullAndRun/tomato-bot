@@ -10,6 +10,7 @@
   "dependencies": {
     "@clack/prompts": "^0.10.0",
     "@tomato/config": "file:data/config",
+    "@tomato/bot": "file:src",
     "@icqqjs/icqq": "^1.6.4",
     "dayjs": "^1.11.13",
     "pg": "^8.14.1",
