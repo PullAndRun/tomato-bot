@@ -31,7 +31,7 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 /bun.lock
 /package-lock.json
-doc
-data
-lib
-log
+/config.toml
+/account
+/ffmpeg
+/log

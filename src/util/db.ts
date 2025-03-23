@@ -1,4 +1,4 @@
-import config from "@tomato/config/global.toml";
+import config from "@tomato/bot/config.toml";
 import { DataSource } from "typeorm";
 import { logger } from "./log";
 

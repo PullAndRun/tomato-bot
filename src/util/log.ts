@@ -1,5 +1,5 @@
 import { text } from "@clack/prompts";
-import config from "@tomato/config/global.toml";
+import config from "@tomato/bot/config.toml";
 import dayjs from "dayjs";
 import { createLogger, format, transports } from "winston";
 
@@ -8,7 +8,7 @@ const { combine, timestamp } = format;
 const logDir = `${config.log.dir_name}/${dayjs().format("YYYY-MM-DD")}`;
 
 const logger = createLogger({
-  level: "info",
+  level: config.log.level,
   format: combine(timestamp(), format.json()),
   transports: [
     new transports.Console(),
