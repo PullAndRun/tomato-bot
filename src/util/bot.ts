@@ -1,10 +1,10 @@
-import config from "@tomato/bot/config.toml";
 import {
   Client,
   createClient,
   type GroupMessageEvent,
   type Sendable,
 } from "@icqqjs/icqq";
+import config from "@tomato/bot/config.toml";
 import { logger, promptUserInput } from "./log";
 
 const clients: Client[] = [];
@@ -15,8 +15,6 @@ async function login(id: number, password: string) {
     ver: config.icqq.ver,
     sign_api_addr: config.icqq.sign_api_addr,
     log_level: config.icqq.log_level,
-    ffmpeg_path: config.icqq.ffmpeg_path,
-    ffprobe_path: config.icqq.ffprobe_path,
     resend: config.icqq.resend,
   });
   client
