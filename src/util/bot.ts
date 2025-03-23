@@ -13,6 +13,7 @@ async function login(id: number, password: string) {
   const client = createClient({
     platform: config.icqq.platform,
     ver: config.icqq.ver,
+    data_dir: config.icqq.data_dir,
     sign_api_addr: config.icqq.sign_api_addr,
     log_level: config.icqq.log_level,
     resend: config.icqq.resend,
