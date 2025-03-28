@@ -94,13 +94,13 @@ async function cmd(
   cmdList: Array<{
     command: string;
     comment: string;
-    role: "system" | "owner" | "admin" | "member";
+    role: string;
     plugin: (event: GroupMessageEvent, message: string) => Promise<void>;
   }>,
   event: GroupMessageEvent
 ) {
   const roleHierarchy = ["member", "admin", "owner", "system"];
-  const cmdParser = {
+  const cmdParser: Record<string, string> = {
     system: "系统管理员",
     owner: "群主",
     admin: "群管理员",
