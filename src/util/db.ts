@@ -16,8 +16,8 @@ const db = new DataSource({
 
 async function init() {
   await db.initialize().catch((e) => {
-    logger.error(`->错误:数据库连接失败,->原因:${JSON.stringify(e)}`);
-    throw new Error(`->错误:数据库连接失败,->原因:${JSON.stringify(e)}`);
+    logger.error(`->错误:数据库连接失败\n->原因:\n${JSON.stringify(e)}`);
+    throw new Error(`->错误:数据库连接失败\n->原因:\n${JSON.stringify(e)}`);
   });
   if (db.isInitialized) {
     logger.info("->数据库连接成功");

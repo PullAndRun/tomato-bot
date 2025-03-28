@@ -1,15 +1,20 @@
 import { text } from "@clack/prompts";
 import config from "@tomato/bot/config.toml";
 import dayjs from "dayjs";
+import path from "path";
 import { createLogger, format, transports } from "winston";
 
-const { combine, timestamp } = format;
+const { combine, timestamp, printf } = format;
 
-const logDir = `${config.log.dir_name}/${dayjs().format("YYYY-MM-DD")}`;
+const logDir = path.join(config.log.dir_name, dayjs().format("YYYY-MM-DD"));
+
+const logFormat = printf(({ level, message, timestamp }) => {
+  return `[${timestamp}] [${level.toUpperCase()}]: ${message}`;
+});
 
 const logger = createLogger({
   level: config.log.level,
-  format: combine(timestamp(), format.json()),
+  format: combine(timestamp(), logFormat),
   transports: [
     new transports.Console(),
     new transports.File({
@@ -29,12 +34,13 @@ async function promptUserInput(
   message: string,
   placeholder: string
 ): Promise<string> {
-  const input = await text({ message, placeholder });
-  if (!input) {
+  while (true) {
+    const input = await text({ message, placeholder });
+    if (input) {
+      return input.toString();
+    }
     logger.warn("->警告:未输入任何内容,请重新输入");
-    return await promptUserInput(message, placeholder);
   }
-  return input.toString();
 }
 
 export { logger, promptUserInput };

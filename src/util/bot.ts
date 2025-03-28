@@ -46,25 +46,30 @@ function getClient() {
   return client;
 }
 
+function logError(
+  action: string,
+  groupId: number,
+  message: Sendable,
+  error: unknown
+) {
+  logger.warn(
+    `->警告:${action}\n->群号:${groupId}\n->原因:\n${JSON.stringify(
+      error
+    )}\n->消息内容:\n${JSON.stringify(message)}`
+  );
+}
+
 async function sendGroupMsg(gid: number, message: Sendable) {
   await getClient()
     .sendGroupMsg(gid, message)
     .catch((e) => {
-      logger.warn(
-        `->警告:群消息发送失败,->群号:${gid},->原因:${JSON.stringify(
-          e
-        )},->消息内容:${JSON.stringify(message)}`
-      );
+      logError("群消息发送失败", gid, message, e);
     });
 }
 
 async function replyGroupMsg(event: GroupMessageEvent, message: Sendable) {
   await event.reply(message, true).catch((e) => {
-    logger.warn(
-      `->警告:群消息回复失败,->群号:${event.group_id},->原因:${JSON.stringify(
-        e
-      )},->消息内容:${JSON.stringify(message)}`
-    );
+    logError("群消息回复失败", event.group_id, message, e);
   });
 }
 
@@ -94,56 +99,42 @@ async function cmd(
   }>,
   event: GroupMessageEvent
 ) {
-  const cmdParser = (cmd: string) => {
-    switch (cmd) {
-      case "system":
-        return "系统管理员";
-      case "owner":
-        return "群主";
-      case "admin":
-        return "群管理员";
-      default:
-        return "任何人";
-    }
+  const roleHierarchy = ["member", "admin", "owner", "system"];
+  const cmdParser = {
+    system: "系统管理员",
+    owner: "群主",
+    admin: "群管理员",
+    member: "任何人",
   };
   for (const cmd of cmdList) {
-    if (!message.startsWith(cmd.command)) {
-      continue;
-    }
-    const roleHierarchy = ["member", "admin", "owner", "system"];
+    if (!message.startsWith(cmd.command)) continue;
     if (
       roleHierarchy.indexOf(event.sender.role || "system") <
         roleHierarchy.indexOf(cmd.role) &&
       event.sender.user_id !== config.bot.admin
     ) {
       await replyGroupMsg(event, [
-        `\n权限不足，无法执行命令`,
-        `\n您需要：${cmdParser(cmd.role)}权限`,
+        `权限不足，无法执行命令`,
+        `\n您需要：${cmdParser[cmd.role]}权限`,
       ]);
       return;
     }
-    await cmd.plugin(event, msgRmCmd(message, [cmd.command])).catch((e) => {
-      logger.error(
-        `->错误:命令执行失败,->命令:${cmd.command},->原因:${JSON.stringify(
-          e
-        )},->消息内容：${message}`
-      );
-    });
+    await cmd.plugin(event, msgRmCmd(message, [cmd.command]));
     return;
   }
   const intro = cmdList
     .map(
       (cmd) =>
-        `指令：${cmd.command}\n说明：${cmd.comment}\n执行权限:${cmdParser(
-          cmd.role
-        )}`
+        `指令：${cmd.command}\n说明：${cmd.comment}\n执行权限:${
+          cmdParser[cmd.role]
+        }`
     )
     .join("\n\n");
   await replyGroupMsg(event, [intro]);
 }
 
 async function init() {
-  await login(config.account.qq.id, config.account.qq.password);
+  await login(config.qq.id, config.qq.password);
 }
 
 export { cmd, init, msgRmCmd, replyGroupMsg, sendGroupMsg };

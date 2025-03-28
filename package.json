@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@clack/prompts": "^0.10.0",
+    "@google/generative-ai": "^0.24.0",
     "@icqqjs/icqq": "^1.6.4",
     "@tomato/bot": "file:",
     "dayjs": "^1.11.13",

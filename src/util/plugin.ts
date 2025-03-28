@@ -3,29 +3,37 @@ import { readdir } from "node:fs/promises";
 import path from "node:path";
 import { logger } from "./log";
 
-const plugins: Array<{
+interface Plugin {
   name: string;
   comment: string;
   plugin: (event: GroupMessageEvent) => Promise<void>;
-}> = [];
+}
+
+const plugins: Plugin[] = [];
 
 async function load() {
-  const fileNames = await readdir("src/plugin");
+  const pluginDir = path.resolve("src/plugin");
+  const fileNames = await readdir(pluginDir);
   for (const fileName of fileNames) {
-    const plugin = (await import(path.resolve(`src/plugin/${fileName}`))).info;
-    if (!plugin) {
+    try {
+      const pluginPath = path.join(pluginDir, fileName);
+      const { info: plugin } = await import(pluginPath);
+      if (!plugin || !plugin.name || !plugin.plugin) continue;
+      plugins.push(plugin);
+    } catch (err) {
       logger.error(
-        `->错误:src/plugin文件夹内发现非插件文件,->文件名:${fileName}`
+        `->加载插件失败:\n->插件名: ${fileName}\n->错误:\n->${JSON.stringify(
+          err
+        )}`
       );
-      continue;
     }
-    plugins.push(plugin);
   }
   plugins.sort((a, b) => b.name.length - a.name.length);
+  logger.info(`->成功加载 ${plugins.length} 个插件`);
 }
 
 function pick(name: string) {
-  return plugins.filter((p) => name.startsWith(p.name))[0];
+  return plugins.find((p) => name.startsWith(p.name));
 }
 
 async function init() {
