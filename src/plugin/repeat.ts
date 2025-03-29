@@ -4,7 +4,7 @@ import { sendGroupMsg } from "../util/bot";
 
 const info = {
   name: "复读",
-  comment: [`说明：复读连续发送3次的群消息`],
+  comment: "复读连续发送3次的群消息",
   plugin,
 };
 
@@ -14,9 +14,8 @@ async function plugin(event: GroupMessageEvent) {
   if (
     raw_message.trim().startsWith(config.bot.name) ||
     raw_message.trim().includes(config.bot.nick_name)
-  ) {
+  )
     return;
-  }
   const repeatItem = repeatMap.get(group_id);
   if (!repeatItem || raw_message !== repeatItem.msg) {
     repeatMap.set(group_id, { msg: raw_message, count: 1 });

@@ -60,16 +60,13 @@ async function searchBoard(region: string, goods: string) {
     鸟: "陆行鸟",
   };
   const serverName = serverMap[region];
-  if (!serverName) {
+  if (!serverName)
     return `未查询到“${region}”服务器信息，请检查服务器名是否正确。`;
-  }
   const borad = await fetchBoard(serverName, goods);
-  if (!borad) {
+  if (!borad)
     return `未在 ${serverName} 区查询到“${goods}”商品，请检查商品名是否正确。`;
-  }
-  if (!borad.fetchItem.listings.length) {
+  if (!borad.fetchItem.listings.length)
     return `您查询的“${goods}”商品目前全区缺货。`;
-  }
   const result = [];
   const formatItemInfo = (
     quality: string,
@@ -101,13 +98,9 @@ async function searchBoard(region: string, goods: string) {
 
 async function fetchBoard(region: string, goods: string) {
   const itemMeta = await fetchItemMeta(goods);
-  if (!itemMeta) {
-    return undefined;
-  }
+  if (!itemMeta) return undefined;
   const fetchItem = await fetchItemDetails(region, itemMeta.ID);
-  if (!fetchItem) {
-    return undefined;
-  }
+  if (!fetchItem) return undefined;
   const parseStock = (data: StockData) => {
     const findListing = (hq: boolean, price: number): Partial<Listing> =>
       data.listings.find((v) => v.hq === hq && v.pricePerUnit === price) || {};
