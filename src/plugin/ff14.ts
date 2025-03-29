@@ -3,6 +3,12 @@ import config from "@tomato/bot/config.toml";
 import { z } from "zod";
 import { cmd, msgRmCmd, replyGroupMsg } from "../util/bot";
 
+const info = {
+  name: "ff14",
+  comment: "ff14 板子 猫|猪|狗|鸟 商品名",
+  plugin,
+};
+
 type Listing = {
   hq: boolean;
   pricePerUnit: number;
@@ -19,17 +25,6 @@ type StockData = {
   minPriceNQ: number;
   minPriceHQ: number;
   listings: Listing[];
-};
-
-type ParsedStock = {
-  hq: Partial<Listing> & { average: number };
-  nq: Partial<Listing> & { average: number };
-};
-
-const info = {
-  name: "ff14",
-  comment: "ff14 板子 猫|猪|狗|鸟 商品名",
-  plugin,
 };
 
 async function plugin(event: GroupMessageEvent) {
@@ -49,7 +44,7 @@ async function board(event: GroupMessageEvent, message: string) {
   const [region, goods] = message.split(" ");
   if (!region || !goods) {
     await replyGroupMsg(event, [
-      "命令错误。请使用“ff14”获取命令的正确使用方式。",
+      "命令错误。请使用“ff14 板子”获取命令的正确使用方式。",
     ]);
     return;
   }
@@ -68,27 +63,40 @@ async function searchBoard(region: string, goods: string) {
   if (!serverName) {
     return `未查询到“${region}”服务器信息，请检查服务器名是否正确。`;
   }
-  const info = await fetchBoard(serverName, goods);
-  if (!info) {
-    return `未查询到“${goods}”商品信息，请检查商品名是否正确。`;
+  const borad = await fetchBoard(serverName, goods);
+  if (!borad) {
+    return `未在 ${serverName} 区查询到“${goods}”商品，请检查商品名是否正确。`;
   }
-  if (info.hq.average === 0 && info.nq.average === 0) {
+  if (!borad.fetchItem.listings.length) {
     return `您查询的“${goods}”商品目前全区缺货。`;
   }
   const result = [];
   const formatItemInfo = (
     quality: string,
-    data: Partial<Listing> & { average: number }
+    listing: Partial<Listing>,
+    currentAveragePrice: number
   ) =>
-    `-${quality}：\n  服务器：${data.worldName}\n  卖家：${data.retainerName}\n  均价：${data.average}\n  现价：${data.pricePerUnit}\n  数量：${data.quantity}\n  总价：${data.total}\n  税费：${data.tax}`;
+    `-${quality}：\n  服务器：${listing.worldName}\n  卖家：${listing.retainerName}\n  均价：${currentAveragePrice}\n  现价：${listing.pricePerUnit}\n  数量：${listing.quantity}\n  总价：${listing.total}\n  税费：${listing.tax}`;
 
-  if (info.hq.average !== 0) {
-    result.push(formatItemInfo("高品质", info.hq));
+  if (borad.fetchItem.minPriceHQ) {
+    result.push(
+      formatItemInfo(
+        "高品质",
+        borad.stock.hq,
+        borad.fetchItem.currentAveragePriceHQ
+      )
+    );
   }
-  if (info.nq.average !== 0) {
-    result.push(formatItemInfo("普通品质", info.nq));
+  if (borad.fetchItem.minPriceNQ) {
+    result.push(
+      formatItemInfo(
+        "普通品质",
+        borad.stock.nq,
+        borad.fetchItem.currentAveragePriceNQ
+      )
+    );
   }
-  return `您查询的“${info.item}”商品信息：\n${result.join("\n")}`;
+  return `您查询的“${goods}”商品信息：\n${result.join("\n")}`;
 }
 
 async function fetchBoard(region: string, goods: string) {
@@ -100,25 +108,22 @@ async function fetchBoard(region: string, goods: string) {
   if (!fetchItem) {
     return undefined;
   }
-  const parseStock = (data: StockData): ParsedStock => {
+  const parseStock = (data: StockData) => {
     const findListing = (hq: boolean, price: number): Partial<Listing> =>
       data.listings.find((v) => v.hq === hq && v.pricePerUnit === price) || {};
     return {
       hq: {
-        average: data.currentAveragePriceHQ,
         ...findListing(true, data.minPriceHQ),
       },
       nq: {
-        average: data.currentAveragePriceNQ,
         ...findListing(false, data.minPriceNQ),
       },
     };
   };
   const stock = parseStock(fetchItem);
   return {
-    item: itemMeta.Name,
-    hq: stock.hq,
-    nq: stock.nq,
+    fetchItem,
+    stock,
   };
 }
 
