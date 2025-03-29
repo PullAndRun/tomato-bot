@@ -13,18 +13,16 @@ const plugins: Plugin[] = [];
 
 async function load() {
   const pluginDir = path.resolve("src/plugin");
-  const fileNames = await readdir(pluginDir);
-  for (const fileName of fileNames) {
+  const files = await readdir(pluginDir);
+  for (const file of files) {
     try {
-      const pluginPath = path.join(pluginDir, fileName);
+      const pluginPath = path.join(pluginDir, file);
       const { info: plugin } = await import(pluginPath);
       if (!plugin || !plugin.name || !plugin.plugin) continue;
       plugins.push(plugin);
     } catch (err) {
       logger.error(
-        `->加载插件失败:\n->插件名: ${fileName}\n->错误:\n->${JSON.stringify(
-          err
-        )}`
+        `->加载插件失败:\n->插件名: ${file}\n->错误:\n->${JSON.stringify(err)}`
       );
     }
   }
