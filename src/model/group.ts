@@ -9,7 +9,7 @@ class Group extends BaseEntity {
   gid: number;
   //prompt
   @Column({ type: "text" })
-  promptName: string;
+  prompt_name: string;
   //自定义prompt
   @Column({ type: "text" })
   prompt: string;

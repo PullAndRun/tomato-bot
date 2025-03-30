@@ -191,7 +191,7 @@ function task() {
     const financeNews = await fetchFinance();
     for (const [_, group] of groups) {
       const lock = await findOrAdd(group.group_id, "新闻推送", false);
-      if (!lock.active) continue;
+      if (!lock.enable) continue;
       await taskSendNews(group.group_id, financeNews, "财经新闻");
       await taskSendNews(group.group_id, hotNews, "热点新闻");
     }

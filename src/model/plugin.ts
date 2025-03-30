@@ -19,7 +19,7 @@ class Plugin extends BaseEntity {
   name: string;
   //是否启用
   @Column({ type: "boolean", default: true })
-  active: boolean;
+  enable: boolean;
 }
 
 function find(gid: number, name: string) {
@@ -29,19 +29,19 @@ function find(gid: number, name: string) {
   });
 }
 
-async function add(gid: number, name: string, active: boolean) {
+async function add(gid: number, name: string, enable: boolean) {
   const plugin = new Plugin();
   plugin.gid = gid;
   plugin.name = name;
-  plugin.active = active;
+  plugin.enable = enable;
   await plugin.save().catch((_) => undefined);
   return plugin;
 }
 
-async function findOrAdd(gid: number, name: string, active: boolean = true) {
+async function findOrAdd(gid: number, name: string, enable: boolean = true) {
   const plugin = await find(gid, name);
   if (!plugin) {
-    return add(gid, name, active);
+    return add(gid, name, enable);
   }
   return plugin;
 }
