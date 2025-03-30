@@ -158,12 +158,14 @@ async function fetchHot() {
 
 async function taskSendNews(
   groupId: number,
-  fetchFunction: () => Promise<
-    Array<{ title: string; content: string }> | undefined
-  >,
+  news:
+    | Array<{
+        title: string;
+        content: string;
+      }>
+    | undefined,
   newsType: string
 ) {
-  const news = await fetchFunction();
   if (!news) return;
   const newNews = await duplicate(groupId, news);
   if (!newNews || !newNews.length) return;
@@ -183,13 +185,15 @@ function task() {
       }
     });
   });
-  schedule.scheduleJob(`0 0 */1 * * *`, async () => {
+  schedule.scheduleJob(`0 */2 * * * *`, async () => {
     const groups = getClient().getGroupList();
+    const hotNews = await fetchHot();
+    const financeNews = await fetchFinance();
     for (const [_, group] of groups) {
       const lock = await findOrAdd(group.group_id, "新闻推送", false);
       if (!lock.active) continue;
-      await taskSendNews(group.group_id, fetchFinance, "财经新闻");
-      await taskSendNews(group.group_id, fetchHot, "热点新闻");
+      await taskSendNews(group.group_id, financeNews, "财经新闻");
+      await taskSendNews(group.group_id, hotNews, "热点新闻");
     }
   });
 }
