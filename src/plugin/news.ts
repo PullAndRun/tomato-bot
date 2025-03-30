@@ -3,6 +3,7 @@ import config from "@tomato/bot/config.toml";
 import schedule from "node-schedule";
 import { z } from "zod";
 import { cmd, getClient, msgRmCmd, replyGroupMsg } from "../util/bot";
+import { findOrAdd } from "../model/plugin";
 
 const info = {
   name: "新闻",
@@ -185,6 +186,8 @@ async function task() {
   schedule.scheduleJob(`0 0 */1 * * *`, async () => {
     const groups = getClient().getGroupList();
     for (const [_, group] of groups) {
+      const lock = await findOrAdd(group.group_id, "新闻推送", false);
+      if (!lock.active) continue;
       await sendGroupNews(group.group_id, fetchFinance, "财经新闻");
       await sendGroupNews(group.group_id, fetchHot, "热点新闻");
     }

@@ -22,4 +22,28 @@ class Plugin extends BaseEntity {
   active: boolean;
 }
 
-export { Plugin };
+function find(gid: number, name: string) {
+  return Plugin.findOneBy({
+    gid,
+    name,
+  });
+}
+
+async function add(gid: number, name: string, active: boolean) {
+  const plugin = new Plugin();
+  plugin.gid = gid;
+  plugin.name = name;
+  plugin.active = active;
+  await plugin.save().catch((_) => undefined);
+  return plugin;
+}
+
+async function findOrAdd(gid: number, name: string, active: boolean = true) {
+  const plugin = await find(gid, name);
+  if (!plugin) {
+    return add(gid, name, active);
+  }
+  return plugin;
+}
+
+export { findOrAdd, Plugin };
