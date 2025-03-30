@@ -6,14 +6,16 @@ import { msgRmCmd, replyGroupMsg } from "../util/bot";
 
 const info = {
   name: "听",
-  comment: "听 歌名 歌手",
+  comment: `使用 "听 [音乐名] [歌手名]" 命令点歌`,
   plugin,
 };
 
 async function plugin(event: GroupMessageEvent) {
   const msg = msgRmCmd(event.raw_message, [config.bot.name, info.name]);
   if (!msg) {
-    await replyGroupMsg(event, [`命令错误。请使用 "听 歌名 歌手" 命令点歌。`]);
+    await replyGroupMsg(event, [
+      `命令错误。请使用 "听 [音乐名] [歌手名]" 命令点歌。`,
+    ]);
     return;
   }
   const music = await pick(msg);

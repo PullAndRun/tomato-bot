@@ -5,7 +5,7 @@ import { cmd, msgRmCmd, replyGroupMsg } from "../util/bot";
 
 const info = {
   name: "ff14",
-  comment: "ff14 板子 猫|猪|狗|鸟 商品名",
+  comment: `使用 "ff14 板子 [猫|猪|狗|鸟] [商品名]" 命令进行最终幻想14交易板商品查询`,
   plugin,
 };
 
@@ -32,7 +32,7 @@ async function plugin(event: GroupMessageEvent) {
   const cmdList = [
     {
       command: "板子",
-      comment: `使用“ff14 板子 猫|猪|狗|鸟 商品名“命令查询所有服务器的市场布告板商品最低价格`,
+      comment: `使用 "ff14 板子 [猫|猪|狗|鸟] [商品名]" 命令进行最终幻想14交易板商品查询`,
       role: "member",
       plugin: board,
     },

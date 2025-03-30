@@ -4,7 +4,7 @@ import { msgRmCmd, replyGroupMsg } from "../util/bot";
 
 const info = {
   name: "占卜",
-  comment: "占卜 占卜内容",
+  comment: `使用 "占卜 [占卜内容]" 命令进行占卜`,
   plugin,
 };
 

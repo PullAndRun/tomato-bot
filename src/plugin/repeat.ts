@@ -4,7 +4,7 @@ import { sendGroupMsg } from "../util/bot";
 
 const info = {
   name: "复读",
-  comment: "复读连续发送3次的群消息",
+  comment: "无",
   plugin,
 };
 
