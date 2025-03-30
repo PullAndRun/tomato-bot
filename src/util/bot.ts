@@ -137,4 +137,4 @@ async function init() {
   await login(config.qq.id, config.qq.password);
 }
 
-export { cmd, init, msgRmCmd, replyGroupMsg, sendGroupMsg };
+export { cmd, getClient, init, msgRmCmd, replyGroupMsg, sendGroupMsg };

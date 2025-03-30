@@ -2,7 +2,8 @@
   "name": "tomato-bot",
   "type": "module",
   "devDependencies": {
-    "@types/bun": "^1.2.5"
+    "@types/bun": "^1.2.5",
+    "@types/node-schedule": "^2.1.7"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -14,6 +15,7 @@
     "@tomato/bot": "file:",
     "dayjs": "^1.11.13",
     "NeteaseCloudMusicApi": "^4.25.0",
+    "node-schedule": "^2.1.1",
     "pg": "^8.14.1",
     "typeorm": "^0.3.21",
     "winston": "^3.17.0",
