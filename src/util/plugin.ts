@@ -15,9 +15,11 @@ async function load() {
   const pluginDir = path.resolve("src/plugin");
   const files = await readdir(pluginDir);
   for (const file of files) {
+    if (!file.endsWith(".js") && !file.endsWith(".ts")) continue;
+    const pluginPath = path.join(pluginDir, file);
     try {
-      const pluginPath = path.join(pluginDir, file);
-      const { info: plugin } = await import(pluginPath);
+      const { info: plugin, init } = await import(pluginPath);
+      if (init) init();
       if (!plugin || !plugin.name || !plugin.plugin) continue;
       plugins.push(plugin);
     } catch (err) {
