@@ -2,8 +2,8 @@ import type { GroupMessageEvent } from "@icqqjs/icqq";
 import config from "@tomato/bot/config.toml";
 import schedule from "node-schedule";
 import { z } from "zod";
-import { cmd, getClient, msgRmCmd, replyGroupMsg } from "../util/bot";
 import { findOrAdd } from "../model/plugin";
+import { cmd, getClient, msgRmCmd, replyGroupMsg } from "../util/bot";
 
 const info = {
   name: "新闻",
@@ -156,7 +156,7 @@ async function fetchHot() {
     .filter((res) => res !== undefined);
 }
 
-async function sendGroupNews(
+async function taskSendNews(
   groupId: number,
   fetchFunction: () => Promise<
     Array<{ title: string; content: string }> | undefined
@@ -175,7 +175,7 @@ async function sendGroupNews(
   ]);
 }
 
-async function task() {
+function task() {
   schedule.scheduleJob(`0 0 0 */1 * *`, () => {
     newsMap.forEach((news, gid) => {
       if (news.length >= 300) {
@@ -188,8 +188,8 @@ async function task() {
     for (const [_, group] of groups) {
       const lock = await findOrAdd(group.group_id, "新闻推送", false);
       if (!lock.active) continue;
-      await sendGroupNews(group.group_id, fetchFinance, "财经新闻");
-      await sendGroupNews(group.group_id, fetchHot, "热点新闻");
+      await taskSendNews(group.group_id, fetchFinance, "财经新闻");
+      await taskSendNews(group.group_id, fetchHot, "热点新闻");
     }
   });
 }
