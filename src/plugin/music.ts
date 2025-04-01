@@ -3,6 +3,7 @@ import config from "@tomato/bot/config.toml";
 import { cloudsearch, comment_new, song_detail } from "NeteaseCloudMusicApi";
 import { z } from "zod";
 import { msgRmCmd, replyGroupMsg } from "../util/bot";
+import { fetchImageToBase64 } from "../util/util";
 
 const info = {
   name: "听",
@@ -39,23 +40,15 @@ async function pick(keyword: string) {
   const song = await fetchSong(id);
   if (!song) return undefined;
   const comment = await fetchHotComment(id);
-  const albumPicture = await fetchAlbumPicture(song.al.picUrl);
+  const albumPicture = await fetchImageToBase64(song.al.picUrl);
   return {
-    albumPicture,
+    albumPicture: `base64://${albumPicture || ""}`,
     comment,
     url: `${config.music.url}${id}`,
     name: song.name,
     singer: song.ar.map((singer) => singer.name).join("、"),
     album: song.al.name,
   };
-}
-
-async function fetchAlbumPicture(url: string) {
-  const picture = await fetch(url, { signal: AbortSignal.timeout(5000) })
-    .then(async (res) => Buffer.from(await res.arrayBuffer()))
-    .catch((_) => undefined);
-  if (!picture) return undefined;
-  return `base64://${Buffer.from(picture).toString("base64")}`;
 }
 
 async function fetchID(keyword: string) {

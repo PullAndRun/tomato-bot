@@ -25,4 +25,41 @@ class Bili extends BaseEntity {
   rid: number;
 }
 
-export { Bili };
+function find(gid: number, mid: number, rid: number) {
+  return Bili.findOneBy({
+    gid,
+    mid,
+    rid,
+  });
+}
+
+async function add(name: string, gid: number, mid: number, rid: number) {
+  const bili = new Bili();
+  bili.name = name;
+  bili.gid = gid;
+  bili.mid = mid;
+  bili.rid = rid;
+  await bili.save().catch((_) => undefined);
+  return bili;
+}
+
+async function findOrAdd(name: string, gid: number, mid: number, rid: number) {
+  const bili = await find(gid, mid, rid);
+  if (!bili) {
+    return add(name, gid, mid, rid);
+  }
+  return bili;
+}
+
+async function remove(name: string) {
+  const bili = await Bili.findOneBy({ name });
+  if (!bili) return undefined;
+  await bili.remove().catch((_) => undefined);
+  return bili;
+}
+
+async function findAll() {
+  return Bili.find();
+}
+
+export { Bili, findAll, findOrAdd, remove };
