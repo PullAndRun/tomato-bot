@@ -18,4 +18,32 @@ class Group extends BaseEntity {
   active: boolean;
 }
 
-export { Group };
+function find(gid: number) {
+  return Group.findOneBy({
+    gid,
+  });
+}
+
+async function add(gid: number) {
+  const group = new Group();
+  group.gid = gid;
+  await group.save().catch((_) => undefined);
+  return group;
+}
+
+async function findOrAdd(gid: number) {
+  const group = await find(gid);
+  if (!group) {
+    return add(gid);
+  }
+  return group;
+}
+
+async function active(gid: number, active: boolean) {
+  const group = await findOrAdd(gid);
+  group.active = active;
+  await group.save().catch((_) => undefined);
+  return group;
+}
+
+export { active, findOrAdd, Group };

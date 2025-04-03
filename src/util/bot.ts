@@ -5,7 +5,10 @@ import {
   type Sendable,
 } from "@icqqjs/icqq";
 import config from "@tomato/bot/config.toml";
+import * as groupModel from "../model/group";
+import * as pluginModel from "../model/plugin";
 import { logger, promptUserInput } from "./log";
+import * as plugin from "./plugin";
 
 const clients: Client[] = [];
 
@@ -133,8 +136,65 @@ async function cmd(
   await replyGroupMsg(event, [intro]);
 }
 
+async function listener() {
+  getClient().on("message.group", async (event) => {
+    const message = msgText(event.raw_message);
+    if (!message.startsWith(config.bot.name)) {
+      plugin.pick("复读");
+      return;
+    }
+    const pickedPlugin = plugin.pick(message);
+    if (!pickedPlugin) {
+      plugin.pick("聊天");
+      return;
+    }
+    const lock = await pluginModel.findOrAdd(
+      event.group_id,
+      pickedPlugin.name,
+      true
+    );
+    if (!lock.enable) {
+      await replyGroupMsg(event, [
+        `错误: "${lock.name}" 功能未激活，请联系管理员激活。`,
+      ]);
+      return;
+    }
+    pickedPlugin.plugin(event);
+  });
+  getClient().on("request.group.invite", async (event) => {
+    await event.approve(true);
+    await getClient().reloadGroupList();
+    await groupModel.active(event.group_id, true);
+    logger.warn(`机器人加入了群 ${event.group_id}`);
+  });
+  getClient().on("notice.group.increase", async (event) => {
+    await sendGroupMsg(event.group_id, [
+      `欢迎新人入群\n`,
+      `昵称: ${event.nickname}\n`,
+      `ID: ${event.user_id}`,
+    ]);
+  });
+  getClient().on("notice.group.decrease", async (event) => {
+    if (config.bot.admin === event.user_id) {
+      await getClient().setGroupLeave(event.group_id);
+      getClient().reloadGroupList();
+      await groupModel.active(event.group_id, false);
+      return;
+    }
+    await sendGroupMsg(event.group_id, [
+      `有群员退群\n`,
+      `昵称: ${event.member?.nickname}\n`,
+      `ID: ${event.user_id}\n`,
+      `原因: ${
+        event.operator_id === event.user_id ? "自己退群" : "管理员清退"
+      }`,
+    ]);
+  });
+}
+
 async function init() {
   await login(config.qq.id, config.qq.password);
+  await listener();
 }
 
 export { cmd, getClient, init, msgRmCmd, replyGroupMsg, sendGroupMsg };

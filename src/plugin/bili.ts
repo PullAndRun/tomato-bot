@@ -3,7 +3,8 @@ import config from "@tomato/bot/config.toml";
 import dayjs from "dayjs";
 import schedule from "node-schedule";
 import { z } from "zod";
-import { findAll, findOrAdd, remove, removeGroup } from "../model/bili";
+import * as biliModel from "../model/bili";
+import * as pluginModel from "../model/plugin";
 import {
   cmd,
   getClient,
@@ -64,7 +65,7 @@ async function follow(event: GroupMessageEvent, uname: string) {
     ]);
     return;
   }
-  await findOrAdd(user.uname, event.group_id, user.mid, user.room_id);
+  await biliModel.findOrAdd(user.uname, event.group_id, user.mid, user.room_id);
   await replyGroupMsg(event, [`关注成功，已为您关注主播 "${uname}"`]);
 }
 
@@ -75,12 +76,12 @@ async function unfollow(event: GroupMessageEvent, uname: string) {
     ]);
     return;
   }
-  await remove(event.group_id, uname);
+  await biliModel.remove(event.group_id, uname);
   await replyGroupMsg(event, [`取关成功，已为您取关主播 "${uname}"`]);
 }
 
 async function list(event: GroupMessageEvent, _: string) {
-  const followList = await findAll();
+  const followList = await biliModel.findAll();
   if (!followList) {
     await replyGroupMsg(event, [`拉取关注列表失败，本群尚未关注任何主播`]);
     return;
@@ -199,20 +200,27 @@ async function task() {
       .entries()
       .toArray()
       .map((v) => v[1].group_id);
-    const biliFindAll = await findAll();
+    const biliFindAll = await biliModel.findAll();
     const biliGroups = biliFindAll.map((v) => v.gid);
     for (const group of biliGroups) {
       if (qGroups.includes(group)) continue;
-      await removeGroup(group);
+      await biliModel.removeGroup(group);
     }
   });
   schedule.scheduleJob(`0 */2 * * * *`, async () => {
     const groups = getClient().getGroupList();
-    const biliFindAll = await findAll();
+    const biliFindAll = await biliModel.findAll();
+    if (!biliFindAll) return undefined;
     const rids = biliFindAll.map((v) => v.rid);
     const lives = await fetchLive(rids);
     if (!lives) return undefined;
     for (const [_, group] of groups) {
+      const lock = await pluginModel.findOrAdd(
+        group.group_id,
+        "直播推送",
+        true
+      );
+      if (!lock.enable) continue;
       const vtbs = biliFindAll.filter((v) => v.gid === group.group_id);
       if (!vtbs) continue;
       for (const vtb of vtbs) {
