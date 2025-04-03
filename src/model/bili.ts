@@ -51,15 +51,24 @@ async function findOrAdd(name: string, gid: number, mid: number, rid: number) {
   return bili;
 }
 
-async function remove(name: string) {
-  const bili = await Bili.findOneBy({ name });
+async function remove(gid: number, name: string) {
+  const bili = await Bili.findOneBy({ gid, name });
   if (!bili) return undefined;
   await bili.remove().catch((_) => undefined);
   return bili;
+}
+
+async function removeGroup(gid: number) {
+  const bilis = await Bili.find({ where: { gid } });
+  if (!bilis) return undefined;
+  for (const bili of bilis) {
+    await bili.remove();
+  }
+  return bilis;
 }
 
 async function findAll() {
   return Bili.find();
 }
 
-export { Bili, findAll, findOrAdd, remove };
+export { Bili, findAll, findOrAdd, remove, removeGroup };

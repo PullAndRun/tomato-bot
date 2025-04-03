@@ -1,8 +1,16 @@
 import { segment, type GroupMessageEvent } from "@icqqjs/icqq";
 import config from "@tomato/bot/config.toml";
+import dayjs from "dayjs";
+import schedule from "node-schedule";
 import { z } from "zod";
-import { findAll, findOrAdd, remove } from "../model/bili";
-import { cmd, msgRmCmd, replyGroupMsg } from "../util/bot";
+import { findAll, findOrAdd, remove, removeGroup } from "../model/bili";
+import {
+  cmd,
+  getClient,
+  msgRmCmd,
+  replyGroupMsg,
+  sendGroupMsg,
+} from "../util/bot";
 import { fetchImageToBase64 } from "../util/util";
 
 const info = {
@@ -67,7 +75,7 @@ async function unfollow(event: GroupMessageEvent, uname: string) {
     ]);
     return;
   }
-  await remove(uname);
+  await remove(event.group_id, uname);
   await replyGroupMsg(event, [`取关成功，已为您取关主播 "${uname}"`]);
 }
 
@@ -112,7 +120,9 @@ async function query(event: GroupMessageEvent, uname: string) {
     segment.image(`base64://${coverImage || ""}`) + "\n",
     `已为您查询主播 "${uname}"\n`,
     `标题: ${liveData.title}\n`,
-    `开播时间: ${new Date(liveData.live_time * 1000)}\n`,
+    `开播时间: ${dayjs(new Date(liveData.live_time * 1000)).format(
+      "YYYY-MM-DD HH:mm:ss"
+    )}\n`,
     `直播间: https://live.bilibili.com/${liveData.room_id}`,
   ]);
 }
@@ -182,4 +192,48 @@ async function fetchLive(room_id: Array<number>) {
   return liveData.data.data;
 }
 
-export { info };
+async function task() {
+  schedule.scheduleJob(`0 0 0 * * *`, async () => {
+    const qGroups = getClient()
+      .getGroupList()
+      .entries()
+      .toArray()
+      .map((v) => v[1].group_id);
+    const biliFindAll = await findAll();
+    const biliGroups = biliFindAll.map((v) => v.gid);
+    for (const group of biliGroups) {
+      if (qGroups.includes(group)) continue;
+      await removeGroup(group);
+    }
+  });
+  schedule.scheduleJob(`0 */2 * * * *`, async () => {
+    const groups = getClient().getGroupList();
+    const biliFindAll = await findAll();
+    const rids = biliFindAll.map((v) => v.rid);
+    const lives = await fetchLive(rids);
+    if (!lives) return undefined;
+    for (const [_, group] of groups) {
+      const vtbs = biliFindAll.filter((v) => v.gid === group.group_id);
+      if (!vtbs) continue;
+      for (const vtb of vtbs) {
+        const user = lives[vtb.mid];
+        const image = await fetchImageToBase64(user.cover_from_user);
+        await sendGroupMsg(group.group_id, [
+          segment.image(`base64://${image}`) + "\n",
+          `主播 "${user.uname}" 已开播\n`,
+          `主题: ${user.title}\n`,
+          `开播时间: ${dayjs(new Date(user.live_time * 1000)).format(
+            "YYYY-MM-DD HH:mm:ss"
+          )}\n`,
+          `直播间: https://live.bilibili.com/${user.room_id}`,
+        ]);
+      }
+    }
+  });
+}
+
+async function init() {
+  task();
+}
+
+export { info, init };
