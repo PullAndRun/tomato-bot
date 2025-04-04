@@ -26,11 +26,11 @@ async function plugin(event: GroupMessageEvent) {
   }
   await replyGroupMsg(event, [
     (music.albumPicture && segment.image(music.albumPicture) + "\n") || "",
-    `传送门：${music.url}`,
-    `\n歌曲名：${music.name}`,
-    `\n歌手：${music.singer}`,
-    `\n专辑：${music.album}`,
-    (music.comment && `\n热评：${music.comment}`) || "",
+    `传送门: ${music.url}`,
+    `\n歌曲名: ${music.name}`,
+    `\n歌手: ${music.singer}`,
+    `\n专辑: ${music.album}`,
+    (music.comment && `\n热评: ${music.comment}`) || "",
   ]);
 }
 

@@ -36,8 +36,14 @@ function pick(name: string) {
   return plugins.find((p) => name.startsWith(p.name));
 }
 
+function help() {
+  return plugins
+    .map((p) => `=>${p.name}\n${p.comment.join("\n")}`)
+    .join("\n\n");
+}
+
 async function init() {
   await load();
 }
 
-export { init, pick };
+export { help, init, pick };

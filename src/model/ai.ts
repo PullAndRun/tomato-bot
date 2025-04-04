@@ -12,4 +12,8 @@ class Ai extends BaseEntity {
   prompt: string;
 }
 
-export { Ai };
+function find(name: string) {
+  return Ai.findOneBy({ name });
+}
+
+export { Ai, find };

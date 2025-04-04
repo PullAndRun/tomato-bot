@@ -7,11 +7,8 @@ class Group extends BaseEntity {
   //群号
   @Column({ type: "float", unique: true })
   gid: number;
-  //prompt
-  @Column({ type: "text" })
-  prompt_name: string;
-  //自定义prompt
-  @Column({ type: "text" })
+  //propmt名称
+  @Column({ type: "text", default: "默认" })
   prompt: string;
   //是否在群里
   @Column({ type: "boolean", default: true })
@@ -39,6 +36,13 @@ async function findOrAdd(gid: number) {
   return group;
 }
 
+async function updatePrompt(gid: number, prompt: string) {
+  const group = await findOrAdd(gid);
+  group.prompt = prompt;
+  await group.save().catch((_) => undefined);
+  return group;
+}
+
 async function active(gid: number, active: boolean) {
   const group = await findOrAdd(gid);
   group.active = active;
@@ -46,4 +50,4 @@ async function active(gid: number, active: boolean) {
   return group;
 }
 
-export { active, findOrAdd, Group };
+export { active, findOrAdd, Group, updatePrompt };

@@ -6,14 +6,14 @@ import { replyGroupMsg } from "../util/bot";
 
 const info = {
   name: "看原批",
-  comment: [`使用 "看原批" 命令看原批`],
+  comment: [`使用 "看原批" 命令看一则原批笑话`],
   plugin,
 };
 
 async function plugin(event: GroupMessageEvent) {
   const joke = await pickJoke();
   if (!pickJoke) {
-    await replyGroupMsg(event, ["暂时没有原批，请稍候重试。"]);
+    await replyGroupMsg(event, ["暂时没有原批笑话,请稍候重试。"]);
     return;
   }
   await replyGroupMsg(event, [segment.image(`base64://${joke}`)]);

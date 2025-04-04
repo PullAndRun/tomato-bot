@@ -117,8 +117,8 @@ async function cmd(
       event.sender.user_id !== config.bot.admin
     ) {
       await replyGroupMsg(event, [
-        `权限不足，无法执行命令`,
-        `\n您需要：${cmdParser[cmd.role]}权限`,
+        `权限不足,无法执行命令`,
+        `\n您需要: ${cmdParser[cmd.role]}权限`,
       ]);
       return;
     }
@@ -128,7 +128,7 @@ async function cmd(
   const intro = cmdList
     .map(
       (cmd) =>
-        `指令：${cmd.command}\n说明：${cmd.comment}\n执行权限:${
+        `指令: ${cmd.command}\n说明: ${cmd.comment}\n执行权限: ${
           cmdParser[cmd.role]
         }`
     )
@@ -155,7 +155,7 @@ async function listener() {
     );
     if (!lock.enable) {
       await replyGroupMsg(event, [
-        `错误: "${lock.name}" 功能未激活，请联系管理员激活。`,
+        `错误: "${lock.name}" 功能未激活,请联系管理员激活。`,
       ]);
       return;
     }

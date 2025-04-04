@@ -46,4 +46,18 @@ async function findOrAdd(gid: number, name: string, enable: boolean = true) {
   return plugin;
 }
 
-export { findOrAdd, Plugin };
+async function update(gid: number, name: string, enable: boolean) {
+  const plugin = await find(gid, name);
+  if (!plugin) {
+    return add(gid, name, enable);
+  }
+  plugin.enable = enable;
+  await plugin.save().catch((_) => undefined);
+  return plugin;
+}
+
+async function findByGid(gid: number) {
+  return Plugin.findBy({ gid });
+}
+
+export { findByGid, findOrAdd, Plugin, update };

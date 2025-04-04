@@ -3,8 +3,8 @@ import config from "@tomato/bot/config.toml";
 import { sendGroupMsg } from "../util/bot";
 
 const info = {
-  name: "复读",
-  comment: [""],
+  name: "复读=>无法调用",
+  comment: ["内置复读功能"],
   plugin,
 };
 

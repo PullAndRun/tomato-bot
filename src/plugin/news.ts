@@ -8,8 +8,8 @@ import { cmd, getClient, msgRmCmd, replyGroupMsg } from "../util/bot";
 const info = {
   name: "新闻",
   comment: [
-    `使用 "新闻 头条" 命令获取当前头条新闻`,
-    `使用 "新闻 财经" 命令获取当前财经新闻`,
+    `使用 "新闻 头条" 命令查看当前头条新闻`,
+    `使用 "新闻 财经" 命令查看当前财经新闻`,
   ],
   plugin,
 };
@@ -20,13 +20,13 @@ async function plugin(event: GroupMessageEvent) {
   const cmdList = [
     {
       command: "头条",
-      comment: `使用 "新闻 头条" 命令获取当前头条新闻`,
+      comment: `使用 "新闻 头条" 命令查看当前头条新闻`,
       role: "member",
       plugin: hotNews,
     },
     {
       command: "财经",
-      comment: `使用 "新闻 财经" 命令获取当前财经新闻`,
+      comment: `使用 "新闻 财经" 命令查看当前财经新闻`,
       role: "member",
       plugin: financeNews,
     },
@@ -51,7 +51,7 @@ async function sendNews(
 ) {
   const news = await fetchFunction();
   if (!news) {
-    await replyGroupMsg(event, [`获取${newsType}失败，请稍后再试。`]);
+    await replyGroupMsg(event, [`获取${newsType}失败,请稍后再试。`]);
     return;
   }
   const newNews = await duplicate(event.group_id, news);

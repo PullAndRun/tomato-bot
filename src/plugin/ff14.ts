@@ -46,7 +46,7 @@ async function board(event: GroupMessageEvent, message: string) {
   const [region, goods] = message.split(" ");
   if (!region || !goods) {
     await replyGroupMsg(event, [
-      "命令错误。请使用“ff14 板子”获取命令的正确使用方式。",
+      `命令错误。请使用 "ff14" 获取命令的正确使用方式。`,
     ]);
     return;
   }
@@ -63,19 +63,19 @@ async function searchBoard(region: string, goods: string) {
   };
   const serverName = serverMap[region];
   if (!serverName)
-    return `未查询到“${region}”服务器信息，请检查服务器名是否正确。`;
+    return `未查询到 "${region}" 服务器信息,请检查服务器名是否正确\n服务器名仅支持 "猫|猪|狗|鸟"`;
   const borad = await fetchBoard(serverName, goods);
   if (!borad)
-    return `未在 ${serverName} 区查询到“${goods}”商品，请检查商品名是否正确。`;
+    return `未在 ${serverName} 区查询到 "${goods}" 商品,请检查商品名是否正确。`;
   if (!borad.fetchItem.listings.length)
-    return `您查询的“${goods}”商品目前全区缺货。`;
+    return `您查询的 "${goods}" 商品目前全区缺货。`;
   const result = [];
   const formatItemInfo = (
     quality: string,
     listing: Partial<Listing>,
     currentAveragePrice: number
   ) =>
-    `-${quality}：\n  服务器：${listing.worldName}\n  卖家：${listing.retainerName}\n  均价：${currentAveragePrice}\n  现价：${listing.pricePerUnit}\n  数量：${listing.quantity}\n  总价：${listing.total}\n  税费：${listing.tax}`;
+    `-${quality}:\n  服务器: ${listing.worldName}\n  卖家: ${listing.retainerName}\n  均价: ${currentAveragePrice}\n  现价: ${listing.pricePerUnit}\n  数量: ${listing.quantity}\n  总价: ${listing.total}\n  税费: ${listing.tax}`;
 
   if (borad.fetchItem.minPriceHQ) {
     result.push(
@@ -95,7 +95,7 @@ async function searchBoard(region: string, goods: string) {
       )
     );
   }
-  return `您查询的“${goods}”商品信息：\n${result.join("\n")}`;
+  return `您查询的: ${goods} 商品:\n${result.join("\n")}`;
 }
 
 async function fetchBoard(region: string, goods: string) {
