@@ -5,7 +5,9 @@ import { cmd, msgRmCmd, replyGroupMsg } from "../util/bot";
 
 const info = {
   name: "ff14",
-  comment: `使用 "ff14 板子 [猫|猪|狗|鸟] [商品名]" 命令进行最终幻想14交易板商品查询`,
+  comment: [
+    `使用 "ff14 板子 [猫|猪|狗|鸟] [商品名]" 命令进行最终幻想14交易板商品查询`,
+  ],
   plugin,
 };
 

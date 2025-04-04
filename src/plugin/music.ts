@@ -7,7 +7,7 @@ import { fetchImageToBase64 } from "../util/util";
 
 const info = {
   name: "听",
-  comment: `使用 "听 [音乐名] [歌手名]" 命令点歌`,
+  comment: [`使用 "听 [音乐名] [歌手名]" 命令点歌`],
   plugin,
 };
 

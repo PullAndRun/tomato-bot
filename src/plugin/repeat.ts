@@ -4,7 +4,7 @@ import { sendGroupMsg } from "../util/bot";
 
 const info = {
   name: "复读",
-  comment: "无",
+  comment: [""],
   plugin,
 };
 

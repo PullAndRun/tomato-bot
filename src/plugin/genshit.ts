@@ -6,7 +6,7 @@ import { replyGroupMsg } from "../util/bot";
 
 const info = {
   name: "看原批",
-  comment: `使用 "看原批" 命令看原批`,
+  comment: [`使用 "看原批" 命令看原批`],
   plugin,
 };
 

@@ -169,9 +169,7 @@ async function listener() {
   });
   getClient().on("notice.group.increase", async (event) => {
     await sendGroupMsg(event.group_id, [
-      `欢迎新人入群\n`,
-      `昵称: ${event.nickname}\n`,
-      `ID: ${event.user_id}`,
+      `欢迎 ${event.nickname} 加入${event.group.name}`,
     ]);
   });
   getClient().on("notice.group.decrease", async (event) => {

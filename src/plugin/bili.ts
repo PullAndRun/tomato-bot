@@ -16,7 +16,12 @@ import { fetchImageToBase64 } from "../util/util";
 
 const info = {
   name: "主播",
-  comment: `使用 "主播 关注 主播昵称" 命令关注主播,使用 "主播 取关 主播昵称" 命令取关主播,使用 "主播 列表" 命令展示已关注主播列表,使用 "主播 查询" 命令查询主播直播讯息`,
+  comment: [
+    `使用 "主播 关注 主播昵称" 命令关注主播`,
+    `使用 "主播 取关 主播昵称" 命令取关主播`,
+    `使用 "主播 列表" 命令展示已关注主播列表`,
+    `使用 "主播 查询" 命令查询主播直播讯息`,
+  ],
   plugin,
 };
 
@@ -116,16 +121,27 @@ async function query(event: GroupMessageEvent, uname: string) {
     await replyGroupMsg(event, [`您查询的主播没开播。`]);
     return;
   }
+  const msg = await liveMsg(liveData);
+  await replyGroupMsg(event, msg);
+}
+
+async function liveMsg(liveData: {
+  cover_from_user: string;
+  title: string;
+  uname: string;
+  live_time: number;
+  room_id: number;
+}) {
   const coverImage = await fetchImageToBase64(liveData.cover_from_user);
-  await replyGroupMsg(event, [
+  return [
     segment.image(`base64://${coverImage || ""}`) + "\n",
-    `已为您查询主播 "${uname}"\n`,
+    `已为您查询主播 "${liveData.uname}"\n`,
     `标题: ${liveData.title}\n`,
-    `开播时间: ${dayjs(new Date(liveData.live_time * 1000)).format(
+    `开播时间: ${dayjs(liveData.live_time * 1000).format(
       "YYYY-MM-DD HH:mm:ss"
     )}\n`,
     `直播间: https://live.bilibili.com/${liveData.room_id}`,
-  ]);
+  ];
 }
 
 async function fetchUser(name: string) {
@@ -225,16 +241,15 @@ async function task() {
       if (!vtbs) continue;
       for (const vtb of vtbs) {
         const user = lives[vtb.mid];
-        const image = await fetchImageToBase64(user.cover_from_user);
-        await sendGroupMsg(group.group_id, [
-          segment.image(`base64://${image}`) + "\n",
-          `主播 "${user.uname}" 已开播\n`,
-          `主题: ${user.title}\n`,
-          `开播时间: ${dayjs(new Date(user.live_time * 1000)).format(
-            "YYYY-MM-DD HH:mm:ss"
-          )}\n`,
-          `直播间: https://live.bilibili.com/${user.room_id}`,
-        ]);
+        if (
+          !dayjs()
+            .subtract(config.bili.frequency, "minute")
+            .isBefore(new Date(user.live_time)) ||
+          user.live_status !== 1
+        )
+          continue;
+        const msg = await liveMsg(user);
+        await sendGroupMsg(group.group_id, msg);
       }
     }
   });

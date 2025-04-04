@@ -5,7 +5,7 @@ import { logger } from "./log";
 
 interface Plugin {
   name: string;
-  comment: string;
+  comment: Array<string>;
   plugin: (event: GroupMessageEvent) => Promise<void>;
 }
 

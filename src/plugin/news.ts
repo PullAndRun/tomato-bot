@@ -7,7 +7,10 @@ import { cmd, getClient, msgRmCmd, replyGroupMsg } from "../util/bot";
 
 const info = {
   name: "新闻",
-  comment: `使用 "新闻 头条" 命令获取当前头条新闻,使用 "新闻 财经" 命令获取当前财经新闻`,
+  comment: [
+    `使用 "新闻 头条" 命令获取当前头条新闻`,
+    `使用 "新闻 财经" 命令获取当前财经新闻`,
+  ],
   plugin,
 };
 
